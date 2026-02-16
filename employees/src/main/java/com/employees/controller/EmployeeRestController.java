@@ -1,6 +1,5 @@
 package com.employees.controller;
 
-import com.employees.dao.EmployeeDAO;
 import com.employees.entity.Employee;
 import com.employees.request.EmployeeRequest;
 import com.employees.service.EmployeeService;

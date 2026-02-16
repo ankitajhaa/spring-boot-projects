@@ -1,6 +1,6 @@
 package com.employees.service;
 
-import com.employees.dao.EmployeeDAO;
+import com.employees.dao.EmployeeRepository;
 import com.employees.entity.Employee;
 import com.employees.request.EmployeeRequest;
 import jakarta.transaction.Transactional;
@@ -8,25 +8,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
 
-    private EmployeeDAO employeeDAO;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeDAO theEmployeeDAO) {
-        employeeDAO = theEmployeeDAO;
+    public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository) {
+        employeeRepository = theEmployeeRepository;
     }
 
     @Override
     public List<Employee> findAll() {
-        return employeeDAO.findAll();
+        return employeeRepository.findAll();
     }
 
     @Override
     public Employee findById(long theId) {
-        Employee theEmployee = employeeDAO.findById(theId);
+        Optional<Employee> result = employeeRepository.findById(theId);
+
+        Employee theEmployee = null;
+
+        if (result.isPresent()) {
+            theEmployee = result.get();
+        }
+        else {
+            throw new RuntimeException("Did not find employee id - " + theId);
+        }
+
         return theEmployee;
     }
 
@@ -34,14 +45,14 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
     public Employee save(EmployeeRequest employeeRequest) {
         Employee theEmployee = convertToEmployee(0, employeeRequest);
-        return employeeDAO.save(theEmployee);
+        return employeeRepository.save(theEmployee);
     }
 
     @Transactional
     @Override
     public Employee update(long id, EmployeeRequest employeeRequest) {
         Employee theEmployee = convertToEmployee(id, employeeRequest);
-        return employeeDAO.save(theEmployee);
+        return employeeRepository.save(theEmployee);
     }
 
     @Override
@@ -54,6 +65,6 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Transactional
     @Override
     public void deleteById(long theId) {
-        employeeDAO.deleteById(theId);
+        employeeRepository.deleteById(theId);
     }
 }
